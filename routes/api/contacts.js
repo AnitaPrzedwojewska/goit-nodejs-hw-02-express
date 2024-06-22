@@ -14,19 +14,14 @@ const validateContact = require("../../utils/validator");
 const router = express.Router();
 
 // GET contacts list =================================
-router.get("/contacts", async (_, res) => {
+router.get("/", async (_, res) => {
   try {
     const contacts = await listContacts();
-    if (contacts.length > 0) {
-      res
-        .status(200)
-        .json({ status: "200", message: "Success", data: { contacts } })
-    } else {
-      res
-        .status(404)
-        .json({ status: "404", message: "Contacts not found" });
-    }
+    res
+      .status(200)
+      .json({ status: "200", message: "Success", data: { contacts } })
   } catch (error) {
+    console.log(error);
     res
       .status(404)
       .json({ status: "404", message: "Not found", details: error.message });
@@ -34,7 +29,7 @@ router.get("/contacts", async (_, res) => {
 });
 
 // GET contact by id =================================
-router.get("/contacts/:contactId", async (req, res) => {
+router.get("/:contactId", async (req, res) => {
   try {
     const { contactId } = req.params;
     const contact = await getContactById(contactId);
@@ -48,6 +43,7 @@ router.get("/contacts/:contactId", async (req, res) => {
         .json({ status: "404", message: "Contact not found" });
     }
   } catch (error) {
+    console.log(error);
     res
       .status(404)
       .json({ status: "404", message: "Not found", details: error.message});
@@ -55,7 +51,7 @@ router.get("/contacts/:contactId", async (req, res) => {
 });
 
 // DELETE contact by id =================================
-router.delete("/contacts/:contactId", async (req, res) => {
+router.delete("/:contactId", async (req, res) => {
   try {
     const { contactId } = req.params;
     const contact = await getContactById(contactId);
@@ -70,6 +66,7 @@ router.delete("/contacts/:contactId", async (req, res) => {
         .json({ status: "404", message: "Contact not found" });
     }
   } catch (error) {
+    console.log(error);
     res
       .status(400)
       .json({ status: "404", message: "Not found", details: error.message });
@@ -77,11 +74,11 @@ router.delete("/contacts/:contactId", async (req, res) => {
 });
 
 // ADD contact =================================
-router.post("/contacts", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const result = validateContact(req.body);
     if (result.error) {
-      res
+      return res
         .status(400)
         .json({ status: "400", message: result.error.message });
     } else {
@@ -93,6 +90,7 @@ router.post("/contacts", async (req, res) => {
         .json({ status: "201", message: "Contact added", data: validatedContact });
     }
   } catch (error) {
+    console.log(error);
     res
       .status(400)
       .json({ status: "404", message: "Not found", details: error.message });
@@ -100,34 +98,29 @@ router.post("/contacts", async (req, res) => {
 });
 
 // UPDATE contact =================================
-router.put("/contacts/:contactId", async (req, res) => {
+router.put("/:contactId", async (req, res) => {
   try {
-    if (Object.keys(req.body) === 0) {
-      res
-        .status(404)
-        .json({ status: "404", message: "Missing fields" });
+    const result = validateContact(req.body);
+    if (result.error) {
+      return res
+        .status(400)
+        .json({ status: "400", message: result.error.message });
     } else {
-      const result = validateContact(req.body);
-      if (result.error) {
+      const { contactId } = req.params;
+      const contact = await getContactById(contactId);
+      if (contact) {
+        await updateContact(contactId, result.value);
         res
-          .status(400)
-          .json({ status: "400", message: result.error.message });
+          .status(200)
+          .json({ status: "200", message: "Contact updated", data: contact });
       } else {
-        const { contactId } = req.params;
-        const contact = await getContactById(contactId);
-        if (contact) {
-          await updateContact(contactId, result.value);
-          res
-            .status(200)
-            .json({ status: "200", message: "Contact updated", data: contact });
-        } else {
-          res
-            .status(404)
-            .json({ status: "404", message: "Contact not found" });
-        }
+        res
+          .status(404)
+          .json({ status: "404", message: "Contact not found" });
       }
     }
   } catch (error) {
+    console.log(error);
     res
       .status(400)
       .json({ status: "404", message: "Not found", details: error.message });
