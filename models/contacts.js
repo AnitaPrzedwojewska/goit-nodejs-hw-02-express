@@ -1,67 +1,54 @@
-const fs = require('node:fs/promises');
-const path = require("node:path");
+const mongoose = require('mongoose');
 
-const contactsPath = path.join(__dirname, "contacts.json");
-
-const listContacts = async () => {
-  try {
-    const data = await fs.readFile(contactsPath);
-    const contacts = JSON.parse(data.toString());
-    return contacts;
-  } catch (error) {
-    throw new Error(error);
+const contactSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, "Name is required"],
+    minLength: 3,
+    maxLength: 30,
+    validate: {
+      validator: function (value) {
+        const regexp = /([A-Z])\w+((\s)?([A-Z]\w+))*/;
+        return regexp.test(value);
+      },
+      message: props => `${props.value} is not a valid name!`
+    }
+  },
+  email: {
+    type: String,
+    required: [true, "Email is required"],
+    validate: {
+      validator: function (value) {
+        const regexp = /^([\w-.]+@([\w-]+.)+[\w-]{2,4})?$/;
+        return regexp.test(value);
+      },
+      message: props => `${props.value} is not a valid email`
+    }
+  },
+  phone: {
+    type: String,
+    required: [true, "Phone number is required"],
+    validate: {
+      validator: function (value) {
+        const regexp = /^\+?\d{2,3}(-?\s? ?\d+)*$/;
+        return regexp.test(value);
+      },
+      message: props => `${props.value} is not a valid phone number`
+    }
+  },
+  favorite: {
+    type: Boolean,
+    default: false
   }
-}
+  // ,
+  // versionKey: false,
+  // timeStamps: true
+})
 
-const getContactById = async (contactId) => {
-  try {
-    const data = await fs.readFile(contactsPath);
-    const contacts = JSON.parse(data.toString());
-    const results = contacts.find((contact) => contact.id === contactId);
-    return results;
-  } catch (error) {
-    throw new Error(error);
-  }
-}
+// contactSchema.static.getAll = function () {
+//   return Task.find().lean();
+// }
 
-const removeContact = async (contactId) => {
-  try {
-    const data = await fs.readFile(contactsPath);
-    const contacts = JSON.parse(data.toString());
-    const results = contacts.filter((contact) => contact.id !== contactId);
-    await fs.writeFile(contactsPath, JSON.stringify(results));
-  } catch (error) {
-    throw new Error(error);
-  }
-}
+const Contact = mongoose.model('Contact', contactSchema, 'contacts');
 
-const addContact = async (body) => {
-  try {
-    const data = await fs.readFile(contactsPath);
-    const contacts = JSON.parse(data.toString());
-    contacts.push(body);
-    await fs.writeFile(contactsPath, JSON.stringify(contacts));
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-const updateContact = async (contactId, body) => {
-  try {
-    const data = await fs.readFile(contactsPath);
-    const contacts = JSON.parse(data.toString());
-    const contact = contacts.find((contact) => contact.id === contactId);
-    Object.keys(body).forEach((key) => (contact[key] = body[key]));
-    await fs.writeFile(contactsPath, JSON.stringify(contacts));
-  } catch (error) {
-    throw new Error(error);
-  }
-}
-
-module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-}
+module.exports = Contact;
