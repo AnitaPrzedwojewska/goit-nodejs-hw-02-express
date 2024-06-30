@@ -1,67 +1,40 @@
-const fs = require('node:fs/promises');
-const path = require("node:path");
+const mongoose = require('mongoose');
 
-const contactsPath = path.join(__dirname, "contacts.json");
+const regexpName = /([A-Z])\w+((\s)?([A-Z]\w+))*/;
+const regexpEmail = /^[a-zA-Z0-9_.±]+@([\w-]+.)+[\w-]{2,4}$/;
+const regexpPhone = /^\+?\d{2,3}(-?\s? ?\d+)*$/;
 
-const listContacts = async () => {
-  try {
-    const data = await fs.readFile(contactsPath);
-    const contacts = JSON.parse(data.toString());
-    return contacts;
-  } catch (error) {
-    throw new Error(error);
+const contactSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    trim: true,
+    required: [true, "Name is required"],
+    minLength: 3,
+    maxLength: 30,
+    validate: [regexpName, "This is not a valid name"],
+  },
+  email: {
+    type: String,
+    trim: true,
+    required: [true, "Email is required"],
+    validate: [regexpEmail, "This is not a valid email"],
+  },
+  phone: {
+    type: String,
+    trim: true,
+    required: [true, "Phone number is required"],
+    validate: [regexpPhone, "This is not a valid phone number"],
+  },
+  favorite: {
+    type: Boolean,
+    default: false,
   }
-}
+},
+{
+  versionKey: false,
+  timeStamps: true
+});
 
-const getContactById = async (contactId) => {
-  try {
-    const data = await fs.readFile(contactsPath);
-    const contacts = JSON.parse(data.toString());
-    const results = contacts.find((contact) => contact.id === contactId);
-    return results;
-  } catch (error) {
-    throw new Error(error);
-  }
-}
+const Contact = mongoose.model('Contact', contactSchema, 'contacts');
 
-const removeContact = async (contactId) => {
-  try {
-    const data = await fs.readFile(contactsPath);
-    const contacts = JSON.parse(data.toString());
-    const results = contacts.filter((contact) => contact.id !== contactId);
-    await fs.writeFile(contactsPath, JSON.stringify(results));
-  } catch (error) {
-    throw new Error(error);
-  }
-}
-
-const addContact = async (body) => {
-  try {
-    const data = await fs.readFile(contactsPath);
-    const contacts = JSON.parse(data.toString());
-    contacts.push(body);
-    await fs.writeFile(contactsPath, JSON.stringify(contacts));
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-const updateContact = async (contactId, body) => {
-  try {
-    const data = await fs.readFile(contactsPath);
-    const contacts = JSON.parse(data.toString());
-    const contact = contacts.find((contact) => contact.id === contactId);
-    Object.keys(body).forEach((key) => (contact[key] = body[key]));
-    await fs.writeFile(contactsPath, JSON.stringify(contacts));
-  } catch (error) {
-    throw new Error(error);
-  }
-}
-
-module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-}
+module.exports = Contact;
