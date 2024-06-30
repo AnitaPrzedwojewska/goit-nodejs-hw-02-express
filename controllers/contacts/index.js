@@ -1,66 +1,127 @@
 const {
   fetchAllContacts,
-  // fetchContact
-} = require("./services");
+  fetchContact,
+  removeContact,
+  createContact,
+  updateContact,
+} = require("../../services/contacts/index");
 
 const getAllContacts = async (req, res, next) => {
   try {
     const contacts = await fetchAllContacts();
-    res.json(contacts);
+    res.status(200).json(contacts);
   } catch (error) {
     next(error);
   }
 };
 
-// const getContactById = async (req,res, next) => {
-//   try {
-//     const contact = await fetchContact(req.params.id);
-//     if (contact) {
-//       res.json(contact)
-//     }
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+const getContactById = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
+    const contact = await fetchContact(contactId);
+    if (contact) {
+      res.status(200).json(contact);
+    } else {
+      res.status(404).json({ message: "Contact not found" });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
-// const removeContact = async (contactId) => {
-//   try {
-//     const data = await fs.readFile(contactsPath);
-//     const contacts = JSON.parse(data.toString());
-//     const results = contacts.filter((contact) => contact.id !== contactId);
-//     await fs.writeFile(contactsPath, JSON.stringify(results));
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// };
+const deleteContact = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
+    const contact = await removeContact(contactId);
+    if (contact) {
+      res.status(201).json({ message: "Contact deleted" });
+    } else {
+      res.status(404).json({ message: "Contact not found" });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
-// const addContact = async (body) => {
-//   try {
-//     const data = await fs.readFile(contactsPath);
-//     const contacts = JSON.parse(data.toString());
-//     contacts.push(body);
-//     await fs.writeFile(contactsPath, JSON.stringify(contacts));
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// };
+const addContact = async (req, res, next) => {
+  try {
+    const { name, email, phone } = req.body;
+    const result = await createContact({ name, email, phone });
+    if (!result) {
+      res.status(404).json({ message: "Contact not added" });
+    } else {
+      res.status(201).json(result);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
-// const updateContact = async (contactId, body) => {
-//   try {
-//     const data = await fs.readFile(contactsPath);
-//     const contacts = JSON.parse(data.toString());
-//     const contact = contacts.find((contact) => contact.id === contactId);
-//     Object.keys(body).forEach((key) => (contact[key] = body[key]));
-//     await fs.writeFile(contactsPath, JSON.stringify(contacts));
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// };
+const upContact = async (req, res, next) => {
+  try {
+    if (req.body === {}) {
+      res
+        .status(400)
+        .json({ message: "Missing fields to update" });
+    } else {
+      const bodyKeys = Object.keys(req.body);
+      const allowedFields = ["name", "email", "phone"];
+      const invalidFields = bodyKeys.filter((key) => !allowedFields.includes(key))
+      if (invalidFields.length > 0) {
+        const errors = invalidFields.map((field) => `Invalid field name - ${field}` )
+        res
+          .status(400)
+          .json({ message: "Not allowed field(s) name", errors });
+        next(errors)
+      } else {
+        const { contactId } = req.params;
+        const result = await updateContact(contactId, req.body);
+        if (!result) {
+          res.status(404).json({ message: "Contact not updated" });
+        } else {
+          res.status(201).json(result);
+        }
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const upStatusContact = async (req, res, next) => {
+  try {
+    if (req.body === {}) {
+      res.status(400).json({ message: "Missing field favorite" });
+    } else {
+      const bodyKeys = Object.keys(req.body);
+      const allowedFields = ["favotite"];
+      const invalidFields = bodyKeys.filter((key) => !allowedFields.includes(key))
+      if (invalidFields.length > 0) {
+        const errors = invalidFields.map((field) => `Invalid field name - ${field}`)
+        res
+          .status(400)
+          .json({ message: "Not allowed field(s) name", errors });
+        next(errors)
+      } else {
+        const { contactId } = req.params;
+        const result = await updateContact(contactId, req.body);
+        if (!result) {
+          res.status(404).json({ message: "Contact not updated" });
+        } else {
+          res.status(201).json(result);
+        }
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   getAllContacts,
-  // getContactById,
-  // removeContact,
-  // addContact,
-  // updateContact,
+  getContactById,
+  deleteContact,
+  addContact,
+  upContact,
+  upStatusContact,
 };

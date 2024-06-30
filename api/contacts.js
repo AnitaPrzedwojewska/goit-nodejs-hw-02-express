@@ -4,30 +4,30 @@ const router = express.Router();
 
 const {
   getAllContacts,
-  // getContactById,
-  // addContact,
-  // removeContact,
-  // updateContact,
+  getContactById,
+  deleteContact,
+  addContact,
+  upContact,
+  upStatusContact
 } = require("../controllers/contacts/index");
 
 
 // GET contacts list =================================
 router.get("/", getAllContacts);
-// router.get("/", async (req, res) => {
-//   const contacts = await Contact.find();
-//   res.json(contacts);
-// })
 
 // GET contact by id =================================
-// router.get("/:contactId", getContactById);
+router.get("/:contactId", getContactById);
 
 // DELETE contact by id =================================
-// router.delete("/:contactId", removeContact);
+router.delete("/:contactId", deleteContact);
 
 // ADD contact =================================
-// router.post("/", addContact);
+router.post("/", addContact);
 
 // UPDATE contact =================================
-// router.put("/:contactId", updateContact);
+router.patch("/:contactId", upContact);
+
+// UPDATE contact status =================================
+router.patch("/:contactId/favorite", upStatusContact);
 
 module.exports = router;
