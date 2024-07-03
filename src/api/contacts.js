@@ -10,7 +10,10 @@ const {
   upStatusContact
 } = require("../controllers/contacts/index");
 
-// const { validateNewContact, validateUpContact } = require('../middlewares/contacts/validators');
+const {
+  validateContact,
+  validateContactStatus,
+} = require("../middlewares/contacts/validators");
 
 // GET contacts list =================================
 router.get("/contacts/", getAllContacts);
@@ -22,14 +25,16 @@ router.get("/contacts/:contactId", getContactById);
 router.delete("/contacts/:contactId", deleteContact);
 
 // ADD contact =================================
-router.post("/contacts/", addContact);
-// router.post("/contacts/", validateNewContact, addContact);
+router.post("/contacts/", validateContact, addContact);
 
 // UPDATE contact =================================
-router.patch("/contacts/:contactId", upContact);
-// router.patch("/contacts/:contactId", validateUpContact, upContact);
+router.put("/contacts/:contactId", validateContact, upContact);
 
 // UPDATE contact status =================================
-router.patch("/contacts/:contactId/favorite", upStatusContact);
+router.patch(
+  "/contacts/:contactId/favorite",
+  validateContactStatus,
+  upStatusContact
+);
 
 module.exports = router;

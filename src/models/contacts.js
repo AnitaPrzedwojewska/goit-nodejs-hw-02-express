@@ -5,7 +5,9 @@ const contactSchema = new mongoose.Schema(
     name: { type: String },
     email: { type: String },
     phone: { type: String },
-    favorite: { type: Boolean }
+    favorite: { type: Boolean,
+      default: false,
+      required: true }
   },
   {
     versionKey: false,

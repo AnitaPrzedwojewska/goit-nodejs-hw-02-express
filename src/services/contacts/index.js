@@ -1,4 +1,4 @@
-const { Contact } = require("../../models/contacts");
+const Contact = require("../../models/contacts");
 
 const fetchAllContacts = () => {
   return Contact.find();
@@ -13,10 +13,7 @@ const removeContact = (contactId) => {
 };
 
 const createContact = ({ name, email, phone }) => {
-  console.log('Contact: ', Contact);
-  const result = Contact.create({ name, email, phone });
-  console.log('result: ', result);
-  return result;
+  return Contact.create({ name, email, phone });
 };
 
 const updateContact = (contactId, toUpdate, upsert = false) => {

@@ -15,20 +15,20 @@ const statusSchema = Joi.object({
   favorite: Joi.boolean().required(),
 });
 
-const validateContact = (req, res, next) => {
-  const { error } = contactSchema.validate(req.body);
+const validate = (schema, obj, res, next) => {
+  const { error } = schema.validate(obj);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
   next();
+}
+
+const validateContact = (req, res, next) => {
+  return validate(contactSchema, req.body, res, next);
 };
 
 const validateContactStatus = (req, res, next) => {
-  const { error } = statusSchema.validate(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-  next();
+  return validate(statusSchema, req.body, res, next);
 };
 
 module.exports = { validateContact, validateContactStatus };
