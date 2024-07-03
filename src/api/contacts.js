@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-// const Contact = require('../models/contacts');
 
 const {
   getAllContacts,
@@ -11,23 +10,26 @@ const {
   upStatusContact
 } = require("../controllers/contacts/index");
 
+// const { validateNewContact, validateUpContact } = require('../middlewares/contacts/validators');
 
 // GET contacts list =================================
-router.get("/", getAllContacts);
+router.get("/contacts/", getAllContacts);
 
 // GET contact by id =================================
-router.get("/:contactId", getContactById);
+router.get("/contacts/:contactId", getContactById);
 
 // DELETE contact by id =================================
-router.delete("/:contactId", deleteContact);
+router.delete("/contacts/:contactId", deleteContact);
 
 // ADD contact =================================
-router.post("/", addContact);
+router.post("/contacts/", addContact);
+// router.post("/contacts/", validateNewContact, addContact);
 
 // UPDATE contact =================================
-router.patch("/:contactId", upContact);
+router.patch("/contacts/:contactId", upContact);
+// router.patch("/contacts/:contactId", validateUpContact, upContact);
 
 // UPDATE contact status =================================
-router.patch("/:contactId/favorite", upStatusContact);
+router.patch("/contacts/:contactId/favorite", upStatusContact);
 
 module.exports = router;
