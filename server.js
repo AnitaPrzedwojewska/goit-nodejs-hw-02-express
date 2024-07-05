@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 
 require("dotenv").config();
 const PORT = process.env.PORT || 3000;
-const { DB_HOST: uriDb } = process.env;
+const { DB_HOST: URI_DB } = process.env;
 
-const connection = mongoose.connect(uriDb);
+const connection = mongoose.connect(URI_DB);
 
 const startServer = async () => {
   try {

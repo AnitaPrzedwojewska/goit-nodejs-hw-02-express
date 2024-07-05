@@ -4,7 +4,7 @@ const {
   removeContact,
   createContact,
   updateContact,
-} = require("../../services/contacts/index");
+} = require("../services/contacts-services");
 
 const getAllContacts = async (req, res, next) => {
   try {
@@ -60,6 +60,7 @@ const upContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
     const result = await updateContact(contactId, req.body);
+    console.log('result: ', result);
     if (!result) {
       res.status(404).json({ message: "Contact not updated" });
     } else {

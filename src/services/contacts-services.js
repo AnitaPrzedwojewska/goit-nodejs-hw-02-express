@@ -1,4 +1,4 @@
-const Contact = require("../../models/contacts");
+const Contact = require("../models/contacts-schema");
 
 const fetchAllContacts = () => {
   return Contact.find();
