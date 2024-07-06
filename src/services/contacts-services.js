@@ -1,7 +1,9 @@
 const Contact = require("../models/contacts-schema");
 
-const fetchAllContacts = () => {
-  return Contact.find();
+const fetchAllContacts = (page, limit, filter) => {
+  return Contact.find(filter)
+    .skip((page - 1) * limit)
+    .limit(limit);
 };
 
 const fetchContact = (contactId) => {

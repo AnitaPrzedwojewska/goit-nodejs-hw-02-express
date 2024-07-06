@@ -11,9 +11,10 @@ const {
 
 const getAllContacts = async (req, res, next) => {
   try {
-    const {page=1, limit=LIMIT} = req.query;
-    console.log('page: ', page, '; limit: ', limit);
-    const contacts = await fetchAllContacts().skip((page-1)*limit).limit(limit);
+    const { page = 1, limit = LIMIT, favorite } = req.query;
+    console.log('page: ', page, '; limit: ', limit, '; favorite: ', favorite);
+    const filter = favorite ? {favorite: favorite} : {};
+    const contacts = await fetchAllContacts(page, limit, filter);
 
     res.status(200).json(contacts);
   } catch (error) {
