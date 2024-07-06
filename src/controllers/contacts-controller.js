@@ -1,3 +1,6 @@
+require('dotenv').config();
+const LIMIT = process.env.LIMIT;
+
 const {
   fetchAllContacts,
   fetchContact,
@@ -8,7 +11,10 @@ const {
 
 const getAllContacts = async (req, res, next) => {
   try {
-    const contacts = await fetchAllContacts();
+    const {page=1, limit=LIMIT} = req.query;
+    console.log('page: ', page, '; limit: ', limit);
+    const contacts = await fetchAllContacts().skip((page-1)*limit).limit(limit);
+
     res.status(200).json(contacts);
   } catch (error) {
     next(error);
