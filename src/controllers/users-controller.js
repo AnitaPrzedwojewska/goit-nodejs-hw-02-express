@@ -10,7 +10,7 @@ const registerUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const user = await getUser(email);
+    const user = await getUser({ email: email });
     if (user) {
       res
         .status(409)
@@ -50,7 +50,7 @@ const loginUser = async (req, res, next) => {
     id: user.id,
     email: user.email,
   };
-  const token = jwt.sign(payload, SECRET, { expiresIn: "15s" });
+  const token = jwt.sign(payload, SECRET, { expiresIn: "1d" });
   const userId = user.id;
   const updatedUser = await setUserKey(userId, { token: token });
   return res.status(200).json({
@@ -64,23 +64,34 @@ const loginUser = async (req, res, next) => {
 };
 
 const logoutUser = async (req, res, next) => {
-  const { _id } = req.user;
-  const user = await getUser({_id: _id});
+  const userId = req.user._id;
+  const user = await getUser({ _id: userId });
 
   if (!user) {
     return res
       .status(401)
-      .json({ message: "No such user" });
+      .json({ message: "Not authorized" });
   }
-  const updatedUser = await setUserKey(_id, { token: null });
-  console.log('updatedUser: ', updatedUser);
+  await setUserKey(userId, { token: null });
   return res.status(204).json({
     message: "No content"
   });
 }
 
 const currentUser = async (req, res, next) => {
-// code
+  const userId = req.user._id;
+  const user = await getUser({ _id: userId });
+
+  if (!user) {
+    return res.status(401).json({ message: "Not authorized" });
+  }
+  return res.status(200).json({
+    user: {
+      _id: user._id,
+      email: user.email,
+      subscription: user.subscription,
+    },
+  });
 };
 
 module.exports = {
