@@ -4,12 +4,16 @@ const userSchema = Joi.object({
   password: Joi.string().min(3).required(),
   email: Joi.string().email().required(),
   subscription: Joi.string().valid("starter", "pro", "business"),
-  token: Joi.string(),
+  token: Joi.string()
 });
 
 const loginUserSchema = Joi.object({
   password: Joi.string().min(3).required(),
   email: Joi.string().email().required()
+});
+
+const subscriptionSchema = Joi.object({
+  subscription: Joi.string().valid("starter", "pro", "business")
 });
 
 const validateUser = (req, res, next) => {
@@ -28,4 +32,12 @@ const validateLoginUser = (req, res, next) => {
   next();
 }
 
-module.exports = { validateUser, validateLoginUser };
+const validateSubscription = (req, res, next) => {
+  const { error } = subscriptionSchema.validate(req.query);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+  next();
+}
+
+module.exports = { validateUser, validateLoginUser, validateSubscription };

@@ -94,9 +94,34 @@ const currentUser = async (req, res, next) => {
   });
 };
 
+const userSubscription = async (req, res, next) => {
+  const userId = req.user._id;
+  let user = await getUser({ _id: userId });
+
+  if (!user) {
+    return res.status(401).json({ message: "Not authorized" });
+  }
+
+  const { subscription } = req.query;
+  if (!subscription) {
+    return res.status(400).json({message: "Miss subscription parameter"})
+  }
+
+  user = await setUserKey(userId, { subscription: subscription });
+
+  return res.status(200).json({
+    user: {
+      _id: user._id,
+      email: user.email,
+      subscription: user.subscription,
+    },
+  });
+};
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
-  currentUser
+  currentUser,
+  userSubscription
 };
