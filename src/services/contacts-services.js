@@ -6,16 +6,16 @@ const fetchAllContacts = (page, limit, filter) => {
     .limit(limit);
 };
 
-const fetchContact = (contactId) => {
-  return Contact.findOne({ _id: contactId });
+const fetchContact = (filter) => {
+  return Contact.findOne(filter);
 };
 
 const removeContact = (contactId) => {
   return Contact.deleteOne({ _id: contactId });
 };
 
-const createContact = ({ name, email, phone }) => {
-  return Contact.create({ name, email, phone });
+const createContact = ({ name, email, phone }, owner) => {
+  return Contact.create({ name, email, phone, owner });
 };
 
 const updateContact = (contactId, toUpdate, upsert = false) => {

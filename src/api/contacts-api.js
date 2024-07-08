@@ -35,6 +35,7 @@ router.put("/contacts/:contactId", auth, validateContact, upContact);
 // UPDATE contact status =================================
 router.patch(
   "/contacts/:contactId/favorite",
+  auth,
   validateContactStatus,
   upStatusContact
 );

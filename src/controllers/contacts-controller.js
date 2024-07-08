@@ -12,8 +12,8 @@ const {
 const getAllContacts = async (req, res, next) => {
   try {
     const { page = 1, limit = LIMIT, favorite } = req.query;
-    console.log('page: ', page, '; limit: ', limit, '; favorite: ', favorite);
-    const filter = favorite ? {favorite: favorite} : {};
+    const filter = { owner: req.user._id };
+    if (favorite) { filter.favorite = favorite };
     const contacts = await fetchAllContacts(page, limit, filter);
 
     res.status(200).json(contacts);
@@ -25,11 +25,16 @@ const getAllContacts = async (req, res, next) => {
 const getContactById = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const contact = await fetchContact(contactId);
-    if (contact) {
-      res.status(200).json(contact);
-    } else {
+    const filter = { _id: contactId, owner: req.user._id };
+    const contact = await fetchContact(filter);
+    if (!contact) {
       res.status(404).json({ message: "Contact not found" });
+    } else {
+      if (String(contact.owner) !== String(req.user._id)) {
+        res.status(401).json({ message: "Unauthorized operation" });
+      } else {
+        res.status(200).json(contact);
+      }
     }
   } catch (error) {
     next(error);
@@ -39,11 +44,17 @@ const getContactById = async (req, res, next) => {
 const deleteContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const contact = await removeContact(contactId);
-    if (contact) {
-      res.status(201).json({ message: "Contact deleted" });
-    } else {
+    const filter = { _id: contactId };
+    let contact = await fetchContact(filter);
+    if (!contact) {
       res.status(404).json({ message: "Contact not found" });
+    } else {
+      if (String(contact.owner) !== String(req.user._id)) {
+        res.status(401).json({ message: "Unauthorized operation" });
+      } else {
+        contact = await removeContact(contactId);
+        res.status(200).json(contact);
+      }
     }
   } catch (error) {
     next(error);
@@ -52,11 +63,11 @@ const deleteContact = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   try {
-    const result = await createContact(req.body);
-    if (!result) {
+    const contact = await createContact(req.body, req.user._id);
+    if (!contact) {
       res.status(404).json({ message: "Contact not added" });
     } else {
-      res.status(201).json(result);
+      res.status(201).json(contact);
     }
   } catch (error) {
     next(error);
@@ -66,12 +77,17 @@ const addContact = async (req, res, next) => {
 const upContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const result = await updateContact(contactId, req.body);
-    console.log('result: ', result);
-    if (!result) {
+    const filter = { _id: contactId};
+    let contact = await fetchContact(filter);
+    if (!contact) {
       res.status(404).json({ message: "Contact not updated" });
     } else {
-      res.status(201).json(result);
+      if (String(contact.owner) !== String(req.user._id)) {
+        res.status(401).json({ message: "Unauthorized operation" });
+      } else {
+        contact = await updateContact(contactId, req.body);
+        res.status(201).json(contact);
+      }
     }
   } catch (error) {
     next(error);
@@ -81,11 +97,17 @@ const upContact = async (req, res, next) => {
 const upStatusContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const result = await updateContact(contactId, req.body);
-    if (!result) {
-      res.status(404).json({ message: "Contact not updated" });
+    const filter = { _id: contactId };
+    let contact = await fetchContact(filter);
+    if (!contact) {
+      res.status(404).json({ message: "Contact not found" });
     } else {
-      res.status(201).json(result);
+      if (String(contact.owner) !== String(req.user._id)) {
+        res.status(401).json({ message: "Unauthorized operation" });
+      } else {
+        contact = await updateContact(contactId, req.body);
+        res.status(200).json(contact);
+      }
     }
   } catch (error) {
     next(error);
