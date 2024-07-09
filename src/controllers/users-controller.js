@@ -47,8 +47,7 @@ const loginUser = async (req, res, next) => {
   }
 
   const payload = {
-    id: user.id,
-    email: user.email,
+    id: user.id
   };
   const token = jwt.sign(payload, SECRET, { expiresIn: "1d" });
   const userId = user.id;
@@ -65,49 +64,30 @@ const loginUser = async (req, res, next) => {
 
 const logoutUser = async (req, res, next) => {
   const userId = req.user._id;
-  const user = await getUser({ _id: userId });
-
-  if (!user) {
-    return res
-      .status(401)
-      .json({ message: "Not authorized" });
-  }
   await setUserKey(userId, { token: null });
   return res.status(204).json({
     message: "No content"
   });
 }
 
-const currentUser = async (req, res, next) => {
-  const userId = req.user._id;
-  const user = await getUser({ _id: userId });
-
-  if (!user) {
-    return res.status(401).json({ message: "Not authorized" });
-  }
+const getCurrentUser = async (req, res, next) => {
   return res.status(200).json({
     user: {
-      _id: user._id,
-      email: user.email,
-      subscription: user.subscription,
+      _id: req.user._id,
+      email: req.user.email,
+      subscription: req.user.subscription,
     },
   });
 };
 
-const userSubscription = async (req, res, next) => {
+const setUserSubscription = async (req, res, next) => {
   const userId = req.user._id;
-  let user = await getUser({ _id: userId });
-
-  if (!user) {
-    return res.status(401).json({ message: "Not authorized" });
-  }
-
   const { subscription } = req.query;
   if (!subscription) {
     return res.status(400).json({message: "Miss subscription parameter"})
   }
 
-  user = await setUserKey(userId, { subscription: subscription });
+  const user = await setUserKey(userId, { subscription: subscription });
 
   return res.status(200).json({
     user: {
@@ -122,6 +102,6 @@ module.exports = {
   registerUser,
   loginUser,
   logoutUser,
-  currentUser,
-  userSubscription
+  getCurrentUser,
+  setUserSubscription
 };

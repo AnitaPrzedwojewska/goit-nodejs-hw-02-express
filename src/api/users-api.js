@@ -7,8 +7,8 @@ const {
   registerUser,
   loginUser,
   logoutUser,
-  currentUser,
-  userSubscription
+  getCurrentUser,
+  setUserSubscription
 } = require("../controllers/users-controller");
 
 const {
@@ -27,9 +27,9 @@ router.post("/users/login", validateLoginUser, loginUser);
 router.get("/users/logout", auth, logoutUser);
 
 // GET current user =================================
-router.get("/users/current", auth, currentUser);
+router.get("/users/current", auth, getCurrentUser);
 
 // SET user subscription =================================
-router.patch("/users", auth, validateSubscription, userSubscription);
+router.patch("/users", auth, validateSubscription, setUserSubscription);
 
 module.exports = router;

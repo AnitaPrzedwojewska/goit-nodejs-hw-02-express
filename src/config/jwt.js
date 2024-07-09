@@ -22,6 +22,9 @@ const setJWTStrategy = () => {
         if (!user) {
           return done(new Error("User not found"));
         }
+        if (!user.token) {
+          return done(new Error("Unauthorized"));
+        }
         return done(null, user);
       } catch (error) {
         done(error)

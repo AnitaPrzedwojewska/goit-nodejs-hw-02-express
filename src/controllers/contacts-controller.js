@@ -1,5 +1,5 @@
 require('dotenv').config();
-const LIMIT = process.env.LIMIT;
+const LIMIT = 5;
 
 const {
   fetchAllContacts,
