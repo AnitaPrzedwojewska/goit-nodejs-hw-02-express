@@ -12,8 +12,6 @@ const params = {
   jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
 };
 
-// const User = require("../models/users-schema");
-
 const setJWTStrategy = () => {
   passport.use(
     new Strategy(params, async (payload, done) => {

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const auth = require('../middlewares/authorization/user-auth');
+const { auth, authOwn } = require("../middlewares/authorization/user-auth");
 
 const {
   getAllContacts,
@@ -21,21 +21,22 @@ const {
 router.get("/contacts/", auth, getAllContacts);
 
 // GET contact by id =================================
-router.get("/contacts/:contactId", auth, getContactById);
+router.get("/contacts/:contactId", auth, authOwn, getContactById);
 
 // DELETE contact by id =================================
-router.delete("/contacts/:contactId", auth, deleteContact);
+router.delete("/contacts/:contactId", auth, authOwn, deleteContact);
 
 // ADD contact =================================
 router.post("/contacts/", auth, validateContact, addContact);
 
 // UPDATE contact =================================
-router.put("/contacts/:contactId", auth, validateContact, upContact);
+router.put("/contacts/:contactId", auth, authOwn, validateContact, upContact);
 
 // UPDATE contact status =================================
 router.patch(
   "/contacts/:contactId/favorite",
   auth,
+  authOwn,
   validateContactStatus,
   upStatusContact
 );
