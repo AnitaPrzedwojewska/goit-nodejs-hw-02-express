@@ -66,19 +66,6 @@ const addContact = async (req, res, next) => {
 
 const upContact = async (req, res, next) => {
   try {
-    // const { contactId } = req.params;
-    // const filter = { _id: contactId};
-    // let contact = await fetchContact(filter);
-    // if (!contact) {
-    //   res.status(404).json({ message: "Contact not updated" });
-    // } else {
-    //   if (String(contact.owner) !== String(req.user._id)) {
-    //     res.status(401).json({ message: "Unauthorized operation" });
-    //   } else {
-    //     contact = await updateContact(contactId, req.body);
-    //     res.status(201).json(contact);
-    //   }
-    // }
     const contact = await updateContact(req.params.contactId, req.body);
     res.status(201).json(contact);
   } catch (error) {
@@ -89,18 +76,6 @@ const upContact = async (req, res, next) => {
 const upStatusContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    // const filter = { _id: contactId };
-    // let contact = await fetchContact(filter);
-    // if (!contact) {
-    //   res.status(404).json({ message: "Contact not found" });
-    // } else {
-    //   if (String(contact.owner) !== String(req.user._id)) {
-    //     res.status(401).json({ message: "Unauthorized operation" });
-    //   } else {
-    //     contact = await updateContact(contactId, req.body);
-    //     res.status(200).json(contact);
-    //   }
-    // }
     const contact = await updateContact(contactId, req.body);
     res.status(200).json(contact);
   } catch (error) {
