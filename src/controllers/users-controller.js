@@ -9,10 +9,9 @@ const { getUser, setUserKey } = require('../services/users-services');
 const registerUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
     const user = await getUser({ email: email });
     if (user) {
-      res
+      return res
         .status(409)
         .json({message: "Email in use" });
     }

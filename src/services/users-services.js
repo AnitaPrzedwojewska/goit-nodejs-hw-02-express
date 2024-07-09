@@ -1,7 +1,7 @@
 const User = require("../models/users-schema");
 
-const getUser = ({ key: value }) => {
-  return User.findOne({ key: value });
+const getUser = (filter) => {
+  return User.findOne(filter);
 };
 
 const setUserKey = (_id, key) => {
