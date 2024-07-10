@@ -24,8 +24,7 @@ const getAllContacts = async (req, res, next) => {
 
 const getContactById = async (req, res, next) => {
   try {
-    const { contactId } = req.params;
-    const filter = { _id: contactId, owner: req.user._id };
+    const filter = { _id: req.params.contactId, owner: req.user._id };
     const contact = await fetchContact(filter);
     if (!contact) {
       res.status(404).json({ message: "Contact not found" });
@@ -43,8 +42,8 @@ const getContactById = async (req, res, next) => {
 
 const deleteContact = async (req, res, next) => {
   try {
-    const { contactId } = req.params;
-    const contact = await removeContact(contactId);
+    const filter = { _id: req.params.contactId, owner: req.user._id };
+    const contact = await removeContact(filter);
     res.status(200).json(contact);
   } catch (error) {
     next(error);
@@ -66,7 +65,8 @@ const addContact = async (req, res, next) => {
 
 const upContact = async (req, res, next) => {
   try {
-    const contact = await updateContact(req.params.contactId, req.body);
+    const filter = { _id: req.params.contactId, owner: req.user._id };
+    const contact = await updateContact(filter, req.body);
     res.status(201).json(contact);
   } catch (error) {
     next(error);
@@ -75,8 +75,8 @@ const upContact = async (req, res, next) => {
 
 const upStatusContact = async (req, res, next) => {
   try {
-    const { contactId } = req.params;
-    const contact = await updateContact(contactId, req.body);
+    const filter = { _id: req.params.contactId, owner: req.user._id };
+   const contact = await updateContact(filter, req.body);
     res.status(200).json(contact);
   } catch (error) {
     next(error);

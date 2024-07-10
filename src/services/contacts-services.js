@@ -10,17 +10,17 @@ const fetchContact = (filter) => {
   return Contact.findOne(filter);
 };
 
-const removeContact = (contactId) => {
-  return Contact.deleteOne({ _id: contactId });
-};
-
 const createContact = ({ name, email, phone }, owner) => {
   return Contact.create({ name, email, phone, owner });
 };
 
-const updateContact = (contactId, toUpdate, upsert = false) => {
+const removeContact = (filter) => {
+  return Contact.deleteOne(filter);
+};
+
+const updateContact = (filter, toUpdate, upsert = false) => {
   return Contact.findOneAndUpdate(
-    { _id: contactId },
+    filter,
     { $set: toUpdate },
     {
       new: true,
