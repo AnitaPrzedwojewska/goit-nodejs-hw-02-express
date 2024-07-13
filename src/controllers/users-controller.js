@@ -1,8 +1,11 @@
 const jwt = require("jsonwebtoken");
 require('dotenv').config();
 const SECRET = process.env.SECRET;
+const gravatar = require('gravatar');
 
 const User = require("../models/users-schema");
+const { AVATAR_SIZE } = require("../constants/constants");
+
 
 const { getUser, setUserKey } = require('../services/users-services');
 
@@ -16,15 +19,19 @@ const registerUser = async (req, res, next) => {
         .json({message: "Email in use" });
     }
 
-    const newUser = new User({ email });
+    const avatarURL = gravatar.url(email, { s: AVATAR_SIZE });
+
+    const newUser = new User({ email, avatarURL });
     await newUser.setHashPassword(password);
     await newUser.save();
-    return res
-      .status(201)
-      .json({
-        message: "User registered",
-        user: { email: newUser.email, subscription: newUser.subscription },
-      });
+    return res.status(201).json({
+      message: "User registered",
+      user: {
+        email: newUser.email,
+        avatarURL: avatarURL,
+        subscription: newUser.subscription,
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -60,6 +67,24 @@ const loginUser = async (req, res, next) => {
     },
   });
 };
+
+const setUserAvatar = async (req, res, next) => {
+  const userId = req.user._id;
+  const { avatarURL } = req.query;
+  if (!avatarURL) {
+    return res.status(400).json({ message: "Miss avatar url parameter" });
+  }
+
+  const user = await setUserKey(userId, { avatarURL: avatarURL });
+
+  return res.status(200).json({
+    user: {
+      _id: user._id,
+      email: user.email,
+      avatarURL: user.avatarURL,
+    },
+  });
+}
 
 const logoutUser = async (req, res, next) => {
   const userId = req.user._id;
@@ -100,6 +125,7 @@ const setUserSubscription = async (req, res, next) => {
 module.exports = {
   registerUser,
   loginUser,
+  setUserAvatar,
   logoutUser,
   getCurrentUser,
   setUserSubscription

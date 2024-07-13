@@ -3,17 +3,22 @@ const Joi = require("joi");
 const userSchema = Joi.object({
   password: Joi.string().min(3).required(),
   email: Joi.string().email().required(),
+  avatarURL: Joi.string().uri(),
   subscription: Joi.string().valid("starter", "pro", "business"),
-  token: Joi.string()
+  token: Joi.string(),
 });
 
-const loginUserSchema = Joi.object({
+const userLoginSchema = Joi.object({
   password: Joi.string().min(3).required(),
-  email: Joi.string().email().required()
+  email: Joi.string().email().required(),
 });
 
-const subscriptionSchema = Joi.object({
-  subscription: Joi.string().valid("starter", "pro", "business")
+const userAvatarSchema = Joi.object({
+  avatarURL: Joi.string().uri().required(),
+});
+
+const userSubscriptionSchema = Joi.object({
+  subscription: Joi.string().valid("starter", "pro", "business"),
 });
 
 const validateUser = (req, res, next) => {
@@ -24,20 +29,33 @@ const validateUser = (req, res, next) => {
   next();
 };
 
-const validateLoginUser = (req, res, next) => {
-  const { error } = loginUserSchema.validate(req.body);
+const validateUserLogin = (req, res, next) => {
+  const { error } = userLoginSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
   next();
-}
+};
 
-const validateSubscription = (req, res, next) => {
-  const { error } = subscriptionSchema.validate(req.query);
+const validateUserAvatar = (req, res, next) => {
+  const { error } = userAvatarSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
   next();
-}
+};
 
-module.exports = { validateUser, validateLoginUser, validateSubscription };
+const validateUserSubscription = (req, res, next) => {
+  const { error } = userSubscriptionSchema.validate(req.query);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+  next();
+};
+
+module.exports = {
+  validateUser,
+  validateUserLogin,
+  validateUserAvatar,
+  validateUserSubscription,
+};

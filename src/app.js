@@ -1,10 +1,16 @@
 const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
+const path = require('path');
+// const multer = require('multer');
 
 const jwtStrategy = require('./config/jwt');
 
 const app = express();
+
+app.set("view engine", "ejs");
+app.use(express.static(path.resolve(__dirname, "./")));
+
 const contactsRouter = require("./api/contacts-api");
 const usersRouter = require("./api/users-api");
 
