@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 require('dotenv').config();
 const SECRET = process.env.SECRET;
 const gravatar = require('gravatar');
+const path = require('path');
 
 const User = require("../models/users-schema");
 const { AVATAR_SIZE } = require("../constants/constants");
@@ -9,6 +10,7 @@ const { AVATAR_SIZE } = require("../constants/constants");
 
 const { getUser, setUserKey } = require('../services/users-services');
 
+// registerUser ==================================================
 const registerUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -37,6 +39,7 @@ const registerUser = async (req, res, next) => {
   }
 };
 
+// loginUser ==================================================
 const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
   const user = await getUser({ email: email });
@@ -68,24 +71,7 @@ const loginUser = async (req, res, next) => {
   });
 };
 
-const setUserAvatar = async (req, res, next) => {
-  const userId = req.user._id;
-  const { avatarURL } = req.query;
-  if (!avatarURL) {
-    return res.status(400).json({ message: "Miss avatar url parameter" });
-  }
-
-  const user = await setUserKey(userId, { avatarURL: avatarURL });
-
-  return res.status(200).json({
-    user: {
-      _id: user._id,
-      email: user.email,
-      avatarURL: user.avatarURL,
-    },
-  });
-}
-
+// logoutUser ==================================================
 const logoutUser = async (req, res, next) => {
   const userId = req.user._id;
   await setUserKey(userId, { token: null });
@@ -94,6 +80,7 @@ const logoutUser = async (req, res, next) => {
   });
 }
 
+// getCurrentUser ==================================================
 const getCurrentUser = async (req, res, next) => {
   return res.status(200).json({
     user: {
@@ -104,6 +91,7 @@ const getCurrentUser = async (req, res, next) => {
   });
 };
 
+// setUserSubscription ==================================================
 const setUserSubscription = async (req, res, next) => {
   const userId = req.user._id;
   const { subscription } = req.query;
@@ -122,11 +110,32 @@ const setUserSubscription = async (req, res, next) => {
   });
 };
 
+// setUserAvatar ==================================================
+const setUserAvatar = async (req, res, next) => {
+  const userId = req.user._id;
+  const { filename } = req.file;
+
+  if (!filename) {
+    return res.status(400).json({ message: "Miss avatar url parameter" });
+  }
+
+  const avatarURL = path.join('avatars', filename);
+  const user = await setUserKey(userId, { avatarURL: avatarURL });
+
+  return res.status(200).json({
+    user: {
+      _id: user._id,
+      email: user.email,
+      avatarURL: user.avatarURL,
+    },
+  });
+}
+
 module.exports = {
   registerUser,
   loginUser,
-  setUserAvatar,
   logoutUser,
   getCurrentUser,
-  setUserSubscription
+  setUserSubscription,
+  setUserAvatar
 };

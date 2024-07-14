@@ -9,14 +9,18 @@ const {
   validateUserSubscription
 } = require("../middlewares/validators/users-validators");
 
-const { upload }  = require("../middlewares/images/avatars");
+const {
+  upload,
+  validateAndTransformUserAvatar,
+} = require("../middlewares/images/images-midd");
 
 const {
   registerUser,
   loginUser,
   logoutUser,
   getCurrentUser,
-  setUserSubscription
+  setUserSubscription,
+  setUserAvatar
 } = require("../controllers/users-controller");
 
 // REGISTER user =================================
@@ -24,18 +28,6 @@ router.post("/users/signup", validateUser, registerUser);
 
 // LOGIN user =================================
 router.post("/users/login", validateUserLogin, loginUser);
-
-// CHANGE user avatar =================================
-router.patch(
-  "/users/avatars",
-  upload.single("avatar")
-);
-
-// SHOW user avatar
-router.get("/users/avatars/:imgPath", (req, res) => {
-  const { avatar } = req.params;
-  res.render("avatar", { avatar });
-});
 
 // LOGOUT user =================================
 router.get("/users/logout", auth, logoutUser);
@@ -45,5 +37,14 @@ router.get("/users/current", auth, getCurrentUser);
 
 // SET user subscription =================================
 router.patch("/users", auth, validateUserSubscription, setUserSubscription);
+
+// SET user avatar =================================
+router.patch(
+  "/users/avatars",
+  auth,
+  upload.single("avatar"),
+  validateAndTransformUserAvatar,
+  setUserAvatar
+);
 
 module.exports = router;

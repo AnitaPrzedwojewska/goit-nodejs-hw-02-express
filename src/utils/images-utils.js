@@ -28,10 +28,27 @@ const isImageAndTransform = async (path) =>
       if (err) resolve(false);
 
       try {
+        const w = image.getWidth();
+        const h = image.getHeight();
+        const minDim = w < h ? w : h;
+
+        const cropWidth = w > minDim ? minDim : w;
+        const cropHeight = h > minDim ? minDim : h;
+
+        const centerX = Math.round(w / 2 - cropWidth / 2);
+        const centerY = Math.round(h / 2 - cropHeight / 2);
+
         await image
           .rotate(360)
+          .crop(
+            centerX < 0 ? 0 : centerX,
+            centerY < 0 ? 0 : centerY,
+            cropWidth,
+            cropHeight
+          )
           .resize(AVATAR_SIZE, AVATAR_SIZE)
           .write(path);
+
         resolve(true);
       } catch (error) {
         console.log(error);
