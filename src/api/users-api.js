@@ -2,32 +2,33 @@ const express = require("express");
 const router = express.Router();
 
 const auth = require('../middlewares/authorization/user-auth');
-
+const verifyUser = require('../middlewares/verification/users-verification');
 const {
   validateUser,
   validateUserLogin,
-  validateUserSubscription
+  validateUserSubscription,
+  validateUserEmail
 } = require("../middlewares/validators/users-validators");
-
 const {
   upload,
   validateAndTransformUserAvatar,
 } = require("../middlewares/images/images-midd");
-
 const {
   registerUser,
   loginUser,
   logoutUser,
   getCurrentUser,
   setUserSubscription,
-  setUserAvatar
-} = require("../controllers/users-controller");
+  setUserAvatar,
+  resendVerificationEmail,
+  verifyUserByToken
+} = require("../controllers/users/index");
 
 // REGISTER user =================================
 router.post("/users/signup", validateUser, registerUser);
 
 // LOGIN user =================================
-router.post("/users/login", validateUserLogin, loginUser);
+router.post("/users/login", validateUserLogin, verifyUser, loginUser);
 
 // LOGOUT user =================================
 router.get("/users/logout", auth, logoutUser);
@@ -46,5 +47,11 @@ router.patch(
   validateAndTransformUserAvatar,
   setUserAvatar
 );
+
+// VERIFY user
+router.get("/users/verify/:verificationToken", verifyUserByToken);
+
+// RESEND user verification token
+router.post("/users/verify", validateUserEmail, resendVerificationEmail);
 
 module.exports = router;
