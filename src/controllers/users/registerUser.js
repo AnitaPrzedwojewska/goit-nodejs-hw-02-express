@@ -33,6 +33,7 @@ const registerUser = async (req, res, next) => {
         avatarURL: avatarURL,
         subscription: newUser.subscription,
         verificationToken: newUser.verificationToken,
+        verify: false
       },
     });
   } catch (error) {

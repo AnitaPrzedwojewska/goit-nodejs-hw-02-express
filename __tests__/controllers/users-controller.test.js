@@ -5,19 +5,21 @@ const {
   describe,
   beforeAll,
   afterAll,
-  expect,
-  test
+  test,
+  expect
 } = require("@jest/globals");
 const supertest = require('supertest');
 
 const db = require('../../src/db/db');
-const User = require("../../src/models/users-schema");
+// const User = require("../../src/models/users-schema");
 
 const app = require('../../src/app');
 
+let token;
+
 describe("Users controller", () => {
-  beforeAll(() => {
-    db.connect(URI_DB);
+  beforeAll(async () => {
+    await db.connect(URI_DB);
     console.log("Connected to DB");
   });
 
@@ -29,23 +31,40 @@ describe("Users controller", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json");
     expect(res.status).toEqual(201);
-    expect(res.body).toEqual({ message: "User registered" });
+    expect(res.body.message).toEqual("User registered");
+    expect(res.body.user.email).toEqual("user2@wp.pl");
+    expect(res.body.user.avatarURL).toBeDefined();
+    expect(res.body.user.subscription).toBeDefined();
+    expect(res.body.user.verificationToken).toBeDefined();
+    expect(res.body.user.verify).toEqual(false);
+    token = res.body.user.verificationToken;
+  });
+
+  // VERIFY user
+  test("verify user", async () => {
+    const res = await supertest(app)
+      .get(`/api/users/verify/${token}`)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json");
+    expect(res.status).toEqual(200);
+    expect(res.body.message).toEqual("Verification successful");
+    // expect(res.body.user.verificationToken).toEqual(" ");
+    // expect(res.body.user.verify).toEqual(true);
   });
 
   // loginUser ==================================================
-  // test("get a list of users", async () => {
-  //   const res = await supertest(app).get("/api/users");
-  //   expect(res.statusCode).toEqual(200);
-  //   expect(res.body.length).toEqual(1);
-  // });
-
-  // test("delete users", async () => {
-  //   const res = await supertest(app).delete("/api/users");
-  //   expect(res.statusCode).toEqual(204);
-  // });
+  test("login user", async () => {
+    const res = await supertest(app)
+      .post("/api/users/login")
+      .send({ email: "user2@wp.pl", password: "password2" })
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json");
+    expect(res.status).toEqual(200);
+    expect(res.body.user.email).toEqual("user2@wp.pl");
+  });
 
   afterAll(async () => {
-    await User.deleteMany({});
+    // await User.deleteMany({});
     await db.disconnect();
   });
 });
