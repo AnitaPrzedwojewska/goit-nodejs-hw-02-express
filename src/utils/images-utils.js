@@ -11,8 +11,7 @@ const isAccessible = (path) =>
     .catch(() => false);
 
 const setupFolder = async (path) => {
-  const folderExist = await isAccessible(path);
-  if (!folderExist) {
+  if (!(await isAccessible(path))) {
     try {
       await fs.mkdir(path);
     } catch (error) {

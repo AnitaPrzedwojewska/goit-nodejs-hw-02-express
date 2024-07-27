@@ -1,18 +1,12 @@
 const path = require('path');
+
+const db = require('./src/db/db');
 const app = require('./src/app');
-const mongoose = require("mongoose");
+const { setupFolder } = require('./src/utils/images-utils');
 
-const {
-  setupFolder
-} = require('./src/utils/images-utils');
+const { DB_HOST, PUBLIC_DIR, AVATARS_DIR, TEMP_DIR } = require('./src/constants/constants');
 
-const { PUBLIC_DIR, AVATARS_DIR, TEMP_DIR } = require('./src/constants/constants');
-
-require("dotenv").config();
-const PORT = process.env.PORT || 3000;
-const { DB_HOST: URI_DB } = process.env;
-
-const connection = mongoose.connect(URI_DB);
+const { PORT } = require("./src/constants/constants.js") || 3000;
 
 const publicDir = path.join(process.cwd(), PUBLIC_DIR);
 const avatarsDir = path.join(process.cwd(), AVATARS_DIR);
@@ -20,7 +14,7 @@ const tempDir = path.join(process.cwd(), TEMP_DIR);
 
 const startServer = async () => {
   try {
-    await connection;
+    await db.connect(DB_HOST);
     console.log("Database connection successful.");
     app.listen(PORT, async () => {
       console.log(`Server running. Use our API on port: ${PORT}.`);
@@ -35,4 +29,3 @@ const startServer = async () => {
 };
 
 startServer();
-

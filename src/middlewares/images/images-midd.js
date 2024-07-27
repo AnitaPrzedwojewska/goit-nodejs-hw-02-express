@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require("fs").promises;
 
 const {
+  BASE_URL,
   TEMP_DIR,
   AVATARS_DIR,
   IMAGE_EXT_LIST,
@@ -42,6 +43,7 @@ const upload = multer({
 
 // validateAndTransformUserAvatar ==================================================
 const validateAndTransformUserAvatar = async (req, res, next) => {
+  console.log('BASE_URL: ', BASE_URL);
   if (!req.file) {
     return res.status(400).json({ message: "No file" });
   }

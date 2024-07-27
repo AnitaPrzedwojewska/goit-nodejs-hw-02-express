@@ -3,11 +3,12 @@ const logger = require("morgan");
 const cors = require("cors");
 const path = require('path');
 
+const { PUBLIC_DIR } = require('./constants/constants.js');
 const jwtStrategy = require('./config/jwt');
 
 const app = express();
 
-app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static(path.join(__dirname, "../", PUBLIC_DIR)));
 
 const contactsRouter = require("./api/contacts-api");
 const usersRouter = require("./api/users-api");

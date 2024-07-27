@@ -10,7 +10,7 @@ const {
   addContact,
   upContact,
   upStatusContact,
-} = require("../controllers/contacts-controller");
+} = require("../controllers/contacts/index");
 
 const {
   validateContact,

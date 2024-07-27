@@ -5,10 +5,9 @@ const Strategy = passportJWT.Strategy;
 
 const { getUser } = require('../services/users-services');
 
-require("dotenv").config();
-const SECRET = process.env.SECRET;
+const { JWT_SECRET } = require('../constants/constants');
 const params = {
-  secretOrKey: SECRET,
+  secretOrKey: JWT_SECRET,
   jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
 };
 
