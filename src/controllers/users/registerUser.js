@@ -22,7 +22,7 @@ const registerUser = async (req, res, next) => {
     try {
       await sendVerifyEmail(email, verificationToken);
     } catch (error) {
-      res.status(500).json({ message: "Verification email not send" });
+      return res.status(500).json({ message: "Verification email not send" });
     }
     await newUser.save();
 
